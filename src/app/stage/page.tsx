@@ -27,10 +27,47 @@ export default function StagePage() {
     }));
   };
 
-  const handleSubmit = () => {
-    console.log("Form submitted:", formData);
-    // Add your submission logic here
-    alert("Form submitted successfully!");
+  const handleSubmit = async() => {
+    // console.log("Form submitted:", formData);
+    // alert("Form submitted successfully!");
+    if(!isFormValid) return;
+
+    const payload = {
+      api: formData.api,
+      BatchId : formData.batchId,
+      Manufacturer : formData.manufac,
+      Country: formData.country,
+      Purity: formData.purity,
+      ProductionDate: formData.productionDate,
+      ExpiryDate: formData.expDate,
+      GMPID: formData.gmpId,
+      UploaderEmail: formData.userEmail || "user@gmail.com"
+    };
+
+    try{
+      const res = await fetch("/api/uploadToIPFS",{
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body : JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if(data.success){
+        alert("Data pinned to IPFS!\nCID: " + data.cid);
+        console.log("🔗 IPFS URL:", `https://gateway.pinata.cloud/ipfs/${data.cid}`);
+      }
+      else {
+        alert("❌ IPFS upload failed. Check console for details.");
+        console.error(data.error);
+      }
+    }
+    catch(error){
+      alert("something went wrong")
+      console.log(error);
+    }
   };
 
   const isFormValid = Object.values(formData).every(value => value.trim() !== "");
@@ -145,6 +182,19 @@ export default function StagePage() {
                 className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
               />
             </div>
+          </div>
+
+          {/* Row 5: User Email */}
+          <div className="space-y-2">
+            <Label htmlFor="userEmail" className="text-slate-300">User Email</Label>
+            <Input
+              id="userEmail"
+              type="email"
+              value={formData.userEmail}
+              onChange={(e) => handleInputChange("userEmail", e.target.value)}
+              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+              placeholder="Enter your email address"
+            />
           </div>
 
           {/* Submit Button */}
