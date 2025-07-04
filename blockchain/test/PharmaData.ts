@@ -17,4 +17,10 @@ describe("PharmaceuticalData", function () {
         pharmaData = await PharmaceuticalData.deploy();
         await pharmaData.waitForDeployment();
     });
+
+    describe("Deployment", function () {
+        it("Should deploy successfully", async function () {
+            expect(await pharmaData.getTotalRecords()).to.equal(0);
+        });
+    });
 })
