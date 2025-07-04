@@ -56,5 +56,27 @@ describe("PharmaceuticalData", function () {
             expect(record.uploader).to.equal(owner.address);
             expect(record.isActive).to.equal(true);
         });
+
+        it("Should emit the DataStored Event", async function(){
+            const ipfsHash = "QmX7Bc9dFG2hJ3kL4mT6nP8sR1vW2zY5aB7cD9eF0gH1iJ";
+            const batchId = "BATCH-002";
+            const manufacturer = "Johnson & Johnson";
+            const country = "USA";
+            const purity = 95;
+            const productionDate = Math.floor(Date.now() / 1000);
+            const expiryDate = productionDate + (365 * 24 * 60 * 60);
+            const gmpId = "GMP-456";
+
+            await expect(pharmaData.storeData(
+                ipfsHash,
+                batchId,
+                manufacturer,
+                country,
+                purity,
+                productionDate,
+                expiryDate,
+                gmpId
+            )).to.emit(pharmaData,"Data Stored Successfully");
+        });
     });
 })
