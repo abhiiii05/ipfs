@@ -132,6 +132,59 @@ describe("PharmaceuticalData", function () {
                 expiryDate,
                 gmpId
             )).to.be.revertedWith("Purity cannot exceed 100%");
+        });
+    });
+
+    describe("Update Data", function () {
+        it("should allow owner to update IPFS hash", async function(){
+            const ipfsHash = "QmX7Bc9dFG2hJ3kL4mT6nP8sR1vW2zY5aB7cD9eF0gH1iJ";
+            const newIpfsHash = "QmY8Cd0eGH3lM5nT7oP9sS2wX3zA6bB8cE0fF1gI2jK3lM";
+            const batchId = "BATCH-005";
+            const manufacturer = "Pfizer";
+            const country = "USA";
+            const purity = 98;
+            const productionDate = Math.floor(Date.now() / 1000);
+            const expiryDate = productionDate + (365 * 24 * 60 * 60);
+            const gmpId = "GMP-202";
+
+            await pharmaData.storeData(
+                ipfsHash,
+                batchId,
+                manufacturer,
+                country,
+                purity,
+                productionDate,
+                expiryDate,
+                gmpId
+            );
+
+            await pharmaData.updateData(batchId,ipfsHash);
+            const record  = await pharmaData.getRecord(batchId);
+            expect(record.ipfsHash).to.equal(ipfsHash);
+        });
+        it("Should fail if non-owner tries to update", async function(){
+            const ipfsHash = "QmX7Bc9dFG2hJ3kL4mT6nP8sR1vW2zY5aB7cD9eF0gH1iJ";
+            const newIpfsHash = "QmY8Cd0eGH3lM5nT7oP9sS2wX3zA6bB8cE0fF1gI2jK3lM";
+            const batchId = "BATCH-006";
+            const manufacturer = "Pfizer";
+            const country = "USA";
+            const purity = 98;
+            const productionDate = Math.floor(Date.now() / 1000);
+            const expiryDate = productionDate + (365 * 24 * 60 * 60);
+            const gmpId = "GMP-303";
+
+            await pharmaData.storeData(
+                ipfsHash,
+                batchId,
+                manufacturer,
+                country,
+                purity,
+                productionDate,
+                expiryDate,
+                gmpId
+            );
+
+            await expect(pharmaData.connect(addr1).updateData(batchId,newIpfsHash)).to.be.revertedWith("Only record owner can do this action")
         })
     });
 })
