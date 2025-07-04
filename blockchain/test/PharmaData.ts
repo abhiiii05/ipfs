@@ -78,5 +78,38 @@ describe("PharmaceuticalData", function () {
                 gmpId
             )).to.emit(pharmaData,"Data Stored Successfully");
         });
+
+        it("Should fail if Batch Id already exists", async function(){
+            const ipfsHash = "QmX7Bc9dFG2hJ3kL4mT6nP8sR1vW2zY5aB7cD9eF0gH1iJ";
+            const batchId = "BATCH-003";
+            const manufacturer = "Pfizer";
+            const country = "USA";
+            const purity = 98;
+            const productionDate = Math.floor(Date.now() / 1000);
+            const expiryDate = productionDate + (365 * 24 * 60 * 60);
+            const gmpId = "GMP-789";
+
+            await pharmaData.storeData(
+                ipfsHash,
+                batchId,
+                manufacturer,
+                country,
+                purity,
+                productionDate,
+                expiryDate,
+                gmpId
+            );
+
+            await expect(pharmaData.storeData(
+                ipfsHash,
+                batchId,
+                manufacturer,
+                country,
+                purity,
+                productionDate,
+                expiryDate,
+                gmpId
+            )).to.be.revertedWith("Record already exists for this batch ID");
+        });
     });
 })
