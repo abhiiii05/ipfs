@@ -111,5 +111,27 @@ describe("PharmaceuticalData", function () {
                 gmpId
             )).to.be.revertedWith("Record already exists for this batch ID");
         });
+
+        it("Should fail if purity exeeds 100%",  async function() {
+            const ipfsHash = "QmX7Bc9dFG2hJ3kL4mT6nP8sR1vW2zY5aB7cD9eF0gH1iJ";
+            const batchId = "BATCH-004";
+            const manufacturer = "Pfizer";
+            const country = "USA";
+            const purity = 105; // purity cannot be > 100
+            const productionDate = Math.floor(Date.now() / 1000);
+            const expiryDate = productionDate + (365 * 24 * 60 * 60);
+            const gmpId = "GMP-101";
+
+            await expect(pharmaData.storeData(
+                ipfsHash,
+                batchId,
+                manufacturer,
+                country,
+                purity,
+                productionDate,
+                expiryDate,
+                gmpId
+            )).to.be.revertedWith("Purity cannot exceed 100%");
+        })
     });
 })
