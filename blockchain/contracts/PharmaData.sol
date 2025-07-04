@@ -28,4 +28,11 @@ contract PharmaceuticalData {
             uint256 timestamp
         );
 
+    event DataUpdated(
+            string indexed batchId,
+            string newIpfsHash,
+            address indexed updater,
+            uint256 timestamp
+        );
+
 }
