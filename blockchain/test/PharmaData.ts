@@ -23,4 +23,38 @@ describe("PharmaceuticalData", function () {
             expect(await pharmaData.getTotalRecords()).to.equal(0);
         });
     });
+
+    describe("Store Data", function () {
+        it("Should store the pharma details successfully",  async function(){
+            const ipfsHash = "QmX7Bc9dFG2hJ3kL4mT6nP8sR1vW2zY5aB7cD9eF0gH1iJ";
+            const batchId = "BATCH-001";
+            const manufacturer = "Pfizer";
+            const country = "USA";
+            const purity = 98;
+            const productionDate = Math.floor(Date.now() / 1000);
+            const expiryDate = productionDate + (365 * 24 * 60 * 60); // 1 year exp
+            const gmpId = "GMP-123";
+
+            await pharmaData.storeData(
+                ipfsHash,
+                batchId,
+                manufacturer,
+                country,
+                purity,
+                productionDate,
+                expiryDate,
+                gmpId
+            );
+
+            const record = await pharmaData.getRecord(batchId);
+            expect(record.ipfsHash).to.equal(ipfsHash);
+            expect(record.batchId).to.equal(batchId);
+            expect(record.manufacturer).to.equal(manufacturer);
+            expect(record.country).to.equal(country);
+            expect(record.purity).to.equal(purity);
+            expect(record.gmpId).to.equal(gmpId);
+            expect(record.uploader).to.equal(owner.address);
+            expect(record.isActive).to.equal(true);
+        });
+    });
 })
