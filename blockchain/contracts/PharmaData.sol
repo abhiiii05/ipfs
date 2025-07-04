@@ -17,4 +17,15 @@ contract PharmaceuticalData {
     }
 
     mapping(string => DataRecord) public records;
-    mapping(address => string[]) public userRecords
+    mapping(address => string[]) public userRecords;
+    string[] public allBatchIds;
+
+    event DataStored(
+            string indexed batchId,
+            string ipfsHash,
+            string manufacturer,
+            address indexed uploader,
+            uint256 timestamp
+        );
+
+}
