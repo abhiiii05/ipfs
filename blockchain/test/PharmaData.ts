@@ -76,7 +76,7 @@ describe("PharmaceuticalData", function () {
                 productionDate,
                 expiryDate,
                 gmpId
-            )).to.emit(pharmaData,"Data Stored Successfully");
+            )).to.emit(pharmaData,"DataStored");
         });
 
         it("Should fail if Batch Id already exists", async function(){
@@ -158,9 +158,9 @@ describe("PharmaceuticalData", function () {
                 gmpId
             );
 
-            await pharmaData.updateData(batchId,ipfsHash);
+            await pharmaData.updateData(batchId,newIpfsHash);
             const record  = await pharmaData.getRecord(batchId);
-            expect(record.ipfsHash).to.equal(ipfsHash);
+            expect(record.ipfsHash).to.equal(newIpfsHash);
         });
         it("Should fail if non-owner tries to update", async function(){
             const ipfsHash = "QmX7Bc9dFG2hJ3kL4mT6nP8sR1vW2zY5aB7cD9eF0gH1iJ";
@@ -184,7 +184,7 @@ describe("PharmaceuticalData", function () {
                 gmpId
             );
 
-            await expect(pharmaData.connect(addr1).updateData(batchId,newIpfsHash)).to.be.revertedWith("Only record owner can do this action");
+            await expect(pharmaData.connect(addr1).updateData(batchId,newIpfsHash)).to.be.revertedWith("Only record owner can perform this action");
         });
     });
 
