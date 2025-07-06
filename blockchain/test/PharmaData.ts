@@ -184,7 +184,132 @@ describe("PharmaceuticalData", function () {
                 gmpId
             );
 
-            await expect(pharmaData.connect(addr1).updateData(batchId,newIpfsHash)).to.be.revertedWith("Only record owner can do this action")
-        })
+            await expect(pharmaData.connect(addr1).updateData(batchId,newIpfsHash)).to.be.revertedWith("Only record owner can do this action");
+        });
     });
-})
+
+    describe("Query Functions" , function () {
+        it("Should return User Records", async function (){
+            const ipfsHash1 = "QmX7Bc9dFG2hJ3kL4mT6nP8sR1vW2zY5aB7cD9eF0gH1iJ";
+            const ipfsHash2 = "QmY8Cd0eGH3lM5nT7oP9sS2wX3zA6bB8cE0fF1gI2jK3lM";
+            const batchId1 = "BATCH-007";
+            const batchId2 = "BATCH-008";
+            const manufacturer = "Pfizer";
+            const country = "USA";
+            const purity = 98;
+            const productionDate = Math.floor(Date.now() / 1000);
+            const expiryDate = productionDate + (365 * 24 * 60 * 60);
+            const gmpId = "GMP-404";
+
+            await pharmaData.storeData(
+                ipfsHash1,
+                batchId1,
+                manufacturer,
+                country,
+                purity,
+                productionDate,
+                expiryDate,
+                gmpId
+            );
+
+            await pharmaData.storeData(
+                ipfsHash2,
+                batchId2,
+                manufacturer,
+                country,
+                purity,
+                productionDate,
+                expiryDate,
+                gmpId
+            );
+
+            const userRecords =  await pharmaData.getUserRecords(owner.address);
+            expect(userRecords).to.include(batchId1);
+            expect(userRecords).to.include(batchId2);
+            expect(userRecords.length).to.equal(2);
+        });
+
+        it("Should return total records count",  async function() {
+            const ipfsHash = "QmX7Bc9dFG2hJ3kL4mT6nP8sR1vW2zY5aB7cD9eF0gH1iJ";
+            const batchId = "BATCH-009";
+            const manufacturer = "Pfizer";
+            const country = "USA";
+            const purity = 98;
+            const productionDate = Math.floor(Date.now() / 1000);
+            const expiryDate = productionDate + (365 * 24 * 60 * 60);
+            const gmpId = "GMP-505";
+
+            await pharmaData.storeData(
+                ipfsHash,
+                batchId,
+                manufacturer,
+                country,
+                purity,
+                productionDate,
+                expiryDate,
+                gmpId
+            );
+
+            expect(await pharmaData.getTotalRecords()).to.equal(1);
+        });
+
+        it("Should return all Batch Ids", async function() {
+            const ipfsHash = "QmX7Bc9dFG2hJ3kL4mT6nP8sR1vW2zY5aB7cD9eF0gH1iJ";
+            const batchId = "BATCH-010";
+            const manufacturer = "Pfizer";
+            const country = "USA";
+            const purity = 98;
+            const productionDate = Math.floor(Date.now() / 1000);
+            const expiryDate = productionDate + (365 * 24 * 60 * 60);
+            const gmpId = "GMP-606";
+
+            await pharmaData.storeData(
+                ipfsHash,
+                batchId,
+                manufacturer,
+                country,
+                purity,
+                productionDate,
+                expiryDate,
+                gmpId
+            );
+
+            const allBatchIds = await pharmaData.getAllBatchIds();
+            expect(allBatchIds).to.include(batchId);
+            expect(allBatchIds.length).to.equal(1);
+        });
+    });
+
+    describe("Record Management", function () {
+        it("Should deactivate and reactivate records", async function(){
+            const ipfsHash = "QmX7Bc9dFG2hJ3kL4mT6nP8sR1vW2zY5aB7cD9eF0gH1iJ";
+            const batchId = "BATCH-011";
+            const manufacturer = "Pfizer";
+            const country = "USA";
+            const purity = 98;
+            const productionDate = Math.floor(Date.now() / 1000);
+            const expiryDate = productionDate + (365 * 24 * 60 * 60);
+            const gmpId = "GMP-707";
+
+            await pharmaData.storeData(
+                ipfsHash,
+                batchId,
+                manufacturer,
+                country,
+                purity,
+                productionDate,
+                expiryDate,
+                gmpId
+            );
+
+            await pharmaData.deactivateRecord(batchId); //deactivate
+            let record  = await pharmaData.getRecord(batchId);
+            expect(record.isActive).to.equal(false);
+
+            await pharmaData.reactivateRecord(batchId);
+            record = await  pharmaData.getRecord(batchId);
+            expect(record.isActive).to.equal(true);
+
+        });
+    });
+});
