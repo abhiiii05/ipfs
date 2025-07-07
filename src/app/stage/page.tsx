@@ -8,6 +8,9 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { User, Zap, AlertCircle } from "lucide-react";
+import { blockchainService } from "../../../utils/blockchainService";
+import { FormDataForContract } from "../../../utils/contract";
+import { useState } from "react";
 
 const formSchema = z.object({
   userEmail: z.string().email({ message: "Please enter a valid email address." }),
@@ -29,7 +32,13 @@ export default function StagePage() {
     mode: "onChange",
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<string>("");
+
   const onSubmit = async (formData: FormData) => {
+    setIsSubmitting(true);
+    setSubmitStatus("Starting submission...");
+
     const payload = {
       api: formData.api,
       BatchId: formData.batchId,
@@ -43,24 +52,61 @@ export default function StagePage() {
     };
 
     try {
+      // Step 1: Upload to IPFS
+      setSubmitStatus("Uploading to IPFS...");
       const res = await fetch("/api/uploadToIPFS", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      const ipfsData = await res.json();
 
-      if (data.success) {
-        alert(`Data pinned to IPFS!\nCID: ${data.cid}`);
-        console.log(`🔗 IPFS URL: https://gateway.pinata.cloud/ipfs/${data.cid}`);
-      } else {
-        alert("❌ IPFS upload failed. Check console for details.");
-        console.error(data.error);
+      if (!ipfsData.success) {
+        throw new Error(`IPFS upload failed: ${ipfsData.error}`);
       }
-    } catch (error) {
-      alert("Something went wrong");
-      console.error(error);
+
+      console.log(`IPFS URL: https://gateway.pinata.cloud/ipfs/${ipfsData.cid}`);
+      setSubmitStatus("IPFS upload successful!  Storing on blockchain...");
+
+      // Step 2: Store on Blockchain
+      const contractFormData: FormDataForContract = {
+        api: formData.api,
+        batchId: formData.batchId,
+        manufacturer: formData.manufac,
+        country: formData.country,
+        purity: formData.purity,
+        productionDate: formData.productionDate,
+        expiryDate: formData.expDate,
+        gmpId: formData.gmpId,
+        userEmail: formData.userEmail
+      };
+
+      const blockchainResult = await blockchainService.storePharmaceuticalData(
+        ipfsData.cid,
+        contractFormData
+      );
+
+      if (!blockchainResult.success) {
+        throw new Error(`Blockchain storage failed: ${blockchainResult.error}`);
+      }
+
+      // Success!
+      setSubmitStatus("🎉 Success! Data stored on IPFS and Blockchain!");
+      alert(
+        `SUCCESS!\n\n` +
+        `IPFS Hash: ${ipfsData.cid}\n` +
+        `Blockchain Tx: ${blockchainResult.txHash}\n` +
+        `Batch ID: ${formData.batchId}\n\n` +
+        `Your pharmaceutical data is now permanently stored!`
+      );
+
+    } catch (error: any) {
+      console.error("Submission failed:", error);
+      setSubmitStatus("Submission failed!");
+      alert(`Error: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -144,11 +190,22 @@ export default function StagePage() {
 
             {/* Submit Button */}
             <div className="pt-4">
-              <Button type="submit" disabled={!isValid} className="w-full bg-slate-600 hover:bg-slate-500 text-white font-medium py-3 disabled:opacity-50 disabled:cursor-not-allowed">
+              <Button 
+                type="submit" 
+                disabled={!isValid || isSubmitting} 
+                className="w-full bg-slate-600 hover:bg-slate-500 text-white font-medium py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <Zap className="h-4 w-4 mr-2" />
-                Submit
+                {isSubmitting ? "Processing..." : "Submit to IPFS + Blockchain"}
               </Button>
             </div>
+
+            {/* Status Display */}
+            {submitStatus && (
+              <div className="mt-4 p-3 bg-slate-700 rounded-lg">
+                <p className="text-sm text-slate-300 text-center">{submitStatus}</p>
+              </div>
+            )}
             
             {!isValid && (
               <p className="text-sm text-slate-400 text-center">
