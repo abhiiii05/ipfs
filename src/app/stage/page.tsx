@@ -101,10 +101,11 @@ export default function StagePage() {
         `Your pharmaceutical data is now permanently stored!`
       );
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       console.error("Submission failed:", error);
       setSubmitStatus("Submission failed!");
-      alert(`Error: ${error.message}`);
+      alert(`Error: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
     }

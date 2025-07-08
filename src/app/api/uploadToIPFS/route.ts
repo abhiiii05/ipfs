@@ -30,7 +30,8 @@ export async function POST(req: NextRequest) {
             pinSize: data.PinSize,
             timestamp: data.Timestamp,
         }, { status: 200 });
-    } catch (err: any) {
-        return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+        return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
     }
 }
