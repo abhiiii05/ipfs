@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { PHARMA_CONTRACT_ABI, CONTRACT_CONFIG, PharmaceuticalRecord, FormDataForContract, dateToTimestamp } from './contract';
+import { PHARMA_CONTRACT_ABI, CONTRACT_CONFIG, PharmaceuticalRecord, FormDataForContract, FormDataForContractOfManufacturer ,  FormDataForContractOfRetailer ,dateToTimestamp, FormDataForContractOfProducer } from './contract';
 
 export class BlockchainService {
     private provider: ethers.JsonRpcProvider;
@@ -54,6 +54,118 @@ export class BlockchainService {
 
         } catch (error: any) {
             console.error(' Blockchain storage failed:', error);
+            return {
+                success: false,
+                error: error.message || 'Unknown blockchain error'
+            };
+        }
+    }
+
+    async storeRetailerData(ipfsHash: string, formData: FormDataForContractOfRetailer): Promise<{ success: boolean; txHash?: string; error?: string }> {
+        try {
+            console.log('📤 Storing retailer data on blockchain...');
+            console.log('IPFS Hash:', ipfsHash);
+            console.log('Form Data:', formData);
+
+            // Call smart contract function
+            const tx = await this.contract.storeData(
+                ipfsHash,
+                formData.batchId,
+                formData.retailerId,
+                formData.storeName,
+                formData.productReceived,
+                formData.wholesalerId,
+                formData.quantityReceived,
+                formData.receivedDate
+            );
+
+            console.log('Transaction sent:', tx.hash);
+
+            const receipt = await tx.wait();
+            console.log('✅ Transaction confirmed:', receipt.hash);
+
+            return {
+                success: true,
+                txHash: receipt.hash
+            };
+
+        } catch (error: any) {
+            console.error('Blockchain storage failed:', error);
+            return {
+                success: false,
+                error: error.message || 'Unknown blockchain error'
+            };
+        }
+    }
+
+
+    async storeProducerData(ipfsHash: string, formData:FormDataForContractOfProducer): Promise<{ success: boolean; txHash?: string; error?: string }> {
+        try {
+            console.log('📤 Storing producer data on blockchain...');
+            console.log('IPFS Hash:', ipfsHash);
+            console.log('Form Data:', formData);
+
+            // Call smart contract function
+            const tx = await this.contract.storeData(
+                ipfsHash,
+                formData.batchId,
+                formData.producerId,
+                formData.fullName,
+                formData.materialType,
+                formData.quantity,
+                formData.location,
+                dateToTimestamp(formData.extractDate)
+            );
+
+            console.log('Transaction sent:', tx.hash);
+
+            const receipt = await tx.wait();
+            console.log('✅ Transaction confirmed:', receipt.hash);
+
+            return {
+                success: true,
+                txHash: receipt.hash
+            };
+
+        } catch (error: any) {
+            console.error('Blockchain storage failed:', error);
+            return {
+                success: false,
+                error: error.message || 'Unknown blockchain error'
+            };
+        }
+    }
+
+    async storeManufacturerData(ipfsHash: string, formData: FormDataForContractOfManufacturer): Promise<{ success: boolean; txHash?: string; error?: string }> {
+        try {
+            console.log('📤 Storing manufacturer data on blockchain...');
+            console.log('IPFS Hash:', ipfsHash);
+            console.log('Form Data:', formData);
+
+            // Call smart contract function
+            const tx = await this.contract.storeData(
+                ipfsHash,
+                formData.batchId,
+                formData.manufacturerId,
+                formData.companyName,
+                formData.productName,
+                formData.rawMaterialUsed,
+                formData.quantityUsed,
+                formData.productionDate
+            );
+
+            console.log('Transaction sent:', tx.hash);
+
+            const receipt = await tx.wait();
+            console.log('✅ Transaction confirmed:', receipt.hash);
+
+            return {
+                success: true,
+                txHash: receipt.hash
+            };
+
+        } catch (error: any) {
+            console.error('Blockchain storage failed:', error);
             return {
                 success: false,
                 error: error.message || 'Unknown blockchain error'

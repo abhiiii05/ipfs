@@ -53,6 +53,38 @@ export interface FormDataForContract{
     userEmail: string;
 }
 
+export interface FormDataForContractOfRetailer {
+    retailerId: string;
+    storeName: string;
+    productReceived: string;
+    wholesalerId: string;
+    quantityReceived: number;
+    receivedDate: string;
+    batchId: string;
+    timestamp: string;
+}
+
+export interface FormDataForContractOfManufacturer {
+    manufacturerId: string;
+    companyName: string;
+    productName: string;
+    rawMaterialUsed: string;
+    quantityUsed: string;
+    productionDate: string;
+    batchId: string;
+}
+
+export interface FormDataForContractOfProducer {
+    producerId: string;
+    fullName: string;
+    materialType: string;
+    quantity: string;
+    location: string;
+    extractDate: string;
+    batchId?: string;
+    timestamp: string;
+}
+
 export function dateToTimestamp(dateString : string){
     return Math.floor(new Date(dateString).getTime() / 1000);
 }
