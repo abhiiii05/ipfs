@@ -29,36 +29,64 @@ const dummyManufacturingHistory = [
 
 export default function ManufacturerHistoryPage() {
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Manufacturing History</h1>
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-slate-100 px-4 py-10">
+  <div className="max-w-3xl mx-auto p-6 bg-white shadow-2xl rounded-3xl border border-slate-200">
+    <h1 className="text-4xl font-bold text-teal-700 mb-8 text-center">
+      Manufacturing History
+    </h1>
 
-      {dummyManufacturingHistory.map((entry, index) => (
-        <div key={index} className="border border-gray-300 rounded-md p-4 mb-4">
-          <p><strong>Manufacturer ID:</strong> {entry.manufacturerId}</p>
-          <p><strong>Company Name:</strong> {entry.companyName}</p>
-          <p><strong>Product Name:</strong> {entry.productName}</p>
-          <p><strong>Raw Material Used:</strong> {entry.rawMaterialUsed}</p>
-          <p><strong>Quantity Used:</strong> {entry.quantityUsed} kg</p>
-          <p><strong>Production Date:</strong> {entry.productionDate}</p>
-          <p><strong>Batch ID:</strong> {entry.batchId}</p>
+    {dummyManufacturingHistory.map((entry, index) => (
+      <div
+        key={index}
+        className="bg-slate-50 border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm transition-transform hover:scale-[1.01]"
+      >
+        <div className="space-y-1 text-slate-800 text-[15px] leading-relaxed">
           <p>
-            <strong>IPFS Hash:</strong>{" "}
+            <span className="font-semibold text-teal-600">Manufacturer ID:</span> {entry.manufacturerId}
+          </p>
+          <p>
+            <span className="font-semibold text-teal-600">Company Name:</span> {entry.companyName}
+          </p>
+          <p>
+            <span className="font-semibold text-teal-600">Product Name:</span> {entry.productName}
+          </p>
+          <p>
+            <span className="font-semibold text-teal-600">Raw Material Used:</span> {entry.rawMaterialUsed}
+          </p>
+          <p>
+            <span className="font-semibold text-teal-600">Quantity Used:</span> {entry.quantityUsed} kg
+          </p>
+          <p>
+            <span className="font-semibold text-teal-600">Production Date:</span> {entry.productionDate}
+          </p>
+          <p>
+            <span className="font-semibold text-teal-600">Batch ID:</span> {entry.batchId}
+          </p>
+          <p>
+            <span className="font-semibold text-teal-600">IPFS Hash:</span>{" "}
             <a
               href={`https://ipfs.io/ipfs/${entry.ipfsHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 underline"
+              className="text-blue-600 underline hover:text-blue-800 transition"
             >
               {entry.ipfsHash}
             </a>
           </p>
-          <p><strong>Timestamp:</strong> {new Date(entry.timestamp).toLocaleString()}</p>
+          <p>
+            <span className="font-semibold text-teal-600">Timestamp:</span>{" "}
+            {new Date(entry.timestamp).toLocaleString()}
+          </p>
         </div>
-      ))}
+      </div>
+    ))}
 
-      <Link href="/manufacturer">
-        <span className="text-blue-600 underline mt-6 inline-block">← Back to Manufacturer Dashboard</span>
-      </Link>
-    </div>
+    <Link href="/manufacturer">
+      <span className="text-teal-700 hover:text-teal-900 font-medium underline mt-6 inline-block transition">
+        ← Back to Manufacturer Dashboard
+      </span>
+    </Link>
+  </div>
+</div>
   )
 }
